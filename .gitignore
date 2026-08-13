@@ -137,3 +137,14 @@ e2e/go.work.sum
 
 .cache
 compile_commands.json
+
+
+.pi
+adws
+
+# sssf runtime
+adws/adw_data/sessions/
+adws/adw_data/sssf.db*
+.env
+__pycache__/
+*.pyc
