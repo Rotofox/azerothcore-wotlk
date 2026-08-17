@@ -63,3 +63,7 @@ Read this folder top-to-bottom, or jump to a topic:
 
 The rest of this folder was written against the actual tree (commit `1507ab3f`). If a statement
 here disagrees with the code, the code wins — and please update the docs.
+
+## Working docs
+
+- [fury-nexusframes-handoff.md](fury-nexusframes-handoff.md) — Agent handoff for the **Fury system + NexusFrames** feature (account-wide kill-based progression + its UI addon). Design lives in `specs/fury-nexusframes-design.md`.
