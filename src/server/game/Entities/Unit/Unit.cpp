@@ -3216,7 +3216,11 @@ float Unit::CalculateLevelPenalty(SpellInfo const* spellProto) const
     if (spellProto->SpellLevel < 20)
         LvlPenalty = (20.0f - spellProto->SpellLevel) * 3.75f;
 
-    float LvlFactor = (float(spellProto->SpellLevel) + 6.0f) / float(GetLevel());
+    // QoL: a spell can never be penalised below the level it was designed for. Above the realm's
+    // level cap there is no higher rank to move to, so reference the spell's own cap instead of the
+    // caster's level - otherwise every cast of an older-rank spell keeps losing damage as you level.
+    float refLevel = float(std::min<uint32>(GetLevel(), spellProto->MaxLevel));
+    float LvlFactor = (float(spellProto->SpellLevel) + 6.0f) / refLevel;
     if (LvlFactor > 1.0f)
         LvlFactor = 1.0f;
 

@@ -792,16 +792,16 @@ class spell_dk_pet_scaling : public AuraScript
         // xinef: dk ghoul inherits 70% of strength and 30% of stamina
         if (GetUnitOwner()->GetEntry() != NPC_RISEN_GHOUL)
         {
-            // xinef: ebon garogyle - inherit 30% of stamina
+            // QoL: ebon gargoyle inherits 50% more stamina (45%, was 30%)
             if (GetUnitOwner()->GetEntry() == NPC_EBON_GARGOYLE && stat == STAT_STAMINA)
                 if (Unit* owner = GetUnitOwner()->GetOwner())
-                    amount = CalculatePct(std::max<int32>(0, owner->GetStat(stat)), 30);
+                    amount = CalculatePct(std::max<int32>(0, owner->GetStat(stat)), 45);
             return;
         }
 
         if (Unit* owner = GetUnitOwner()->GetOwner())
         {
-            int32 modifier = stat == STAT_STRENGTH ? 70 : 30;
+            float modifier = stat == STAT_STRENGTH ? 105.0f : 45.0f;
 
             // Check just if owner has Ravenous Dead since it's effect is not an aura
             if (AuraEffect const* rdEff = owner->GetAuraEffect(SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE, SPELLFAMILY_DEATHKNIGHT, 3010, 0))
@@ -827,7 +827,8 @@ class spell_dk_pet_scaling : public AuraScript
         {
             // Percentage of the owner's attack power to be inherited as spell power
             // This value was chosen based on experimental damage of Gargoyle Strike
-            int32 modifier = 75;
+            // QoL: 50% more than the original 75%
+            float modifier = 112.5f;
 
             if (AuraEffect* impurityEff = owner->GetDummyAuraEffect(SPELLFAMILY_DEATHKNIGHT, 1986, EFFECT_0))
                 AddPct(modifier, impurityEff->GetAmount());

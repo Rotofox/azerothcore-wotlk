@@ -263,22 +263,22 @@ class spell_mage_pet_scaling : public AuraScript
 
     void CalculateResistanceAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
     {
-        // xinef: mage pet inherits 40% of resistance from owner and 35% of armor (guessed)
+        // QoL: mage pet inherits 50% more resistance/armor (60% / 52.5%, was 40/35)
         if (Unit* owner = GetUnitOwner()->GetOwner())
         {
             SpellSchoolMask schoolMask = SpellSchoolMask(aurEff->GetSpellInfo()->Effects[aurEff->GetEffIndex()].MiscValue);
-            int32 modifier = schoolMask == SPELL_SCHOOL_MASK_NORMAL ? 35 : 40;
+            float modifier = schoolMask == SPELL_SCHOOL_MASK_NORMAL ? 52.5f : 60.0f;
             amount = CalculatePct(std::max<int32>(0, owner->GetResistance(schoolMask)), modifier);
         }
     }
 
     void CalculateStatAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
     {
-        // xinef: mage pet inherits 30% of intellect / stamina
+        // QoL: mage pet inherits 50% more intellect / stamina (45%, was 30%)
         if (Unit* owner = GetUnitOwner()->GetOwner())
         {
             Stats stat = Stats(aurEff->GetSpellInfo()->Effects[aurEff->GetEffIndex()].MiscValue);
-            amount = CalculatePct(std::max<int32>(0, owner->GetStat(stat)), 30);
+            amount = CalculatePct(std::max<int32>(0, owner->GetStat(stat)), 45);
         }
     }
 
@@ -289,11 +289,11 @@ class spell_mage_pet_scaling : public AuraScript
 
     void CalculateSPAmount(AuraEffect const*  /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
     {
-        // xinef: mage pet inherits 33% of SP
+        // QoL: mage pet inherits 50% more SP (49.5%, was 33%)
         if (Unit* owner = GetUnitOwner()->GetOwner())
         {
             int32 frost = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_FROST);
-            amount = CalculatePct(std::max<int32>(0, frost), 33);
+            amount = CalculatePct(std::max<int32>(0, frost), 49.5f);
 
             // xinef: Update appropriate player field
             if (owner->IsPlayer())

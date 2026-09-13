@@ -14,8 +14,16 @@ Run the linter before claiming a change is done: `python apps/codestyle/codestyl
 - Sniff-backed changes stamp `VerifiedBuild` (the sniff's client build) on every row the sniff validated, including rows the fix doesn't otherwise touch.
 - `creature_immunities`: negative ids are curated shared sets — reference them via `creature_template.CreatureImmunitiesId`, never edit them or allocate new ones. Positive ids are single-creature sets — reuse an existing set only on an exact match; to extend a creature's immunities, insert a superset under a new id and point the creature's `CreatureImmunitiesId` at it.
 
-## The three databases
+## The databases
+
+This fork runs **four** databases. The three core ones are:
 
 - `acore_auth` — accounts, realm list, IP/account bans, session keys. Shared across all realms.
 - `acore_characters` — per-character state: characters, inventory, in-progress quests, mail, guilds, arena teams, achievements. One per realm.
 - `acore_world` — static game content: creature/gameobject/item/quest templates, spawn lists, loot tables, SmartAI scripts, gossip, conditions. Read-mostly; rebuilt from SQL.
+
+Plus `acore_playerbots`, added by the `mod-playerbots` module (bot AI data). See
+`documentation/data-layer.md` for the full picture, including each module's own SQL/tables.
+
+SQL updates target the core DBs via `data/sql/updates/pending_db_{auth,characters,world}/`; modules
+ship their SQL inside their own directory.

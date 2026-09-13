@@ -1,16 +1,36 @@
 # Building and Running
 
-> This page documents the build/run flow from the files in the tree. Nothing here was executed;
-> the facts are read from the build system, the installer scripts, and the artifacts left by the
-> last real build (`var/build/obj/CMakeCache.txt`, `env/dist/`).
+> The server built from this tree is **built, installed, and running**. The facts here are read
+> from the build system, the installer scripts, and the live artifacts in `var/build/obj/` and
+> `env/dist/`.
+
+## Operator aliases (source of truth: `~/.bashrc` on the server host)
+
+These shell aliases are the operator's canonical commands for this box. If they change, update this
+section.
+
+| Alias | Command |
+|---|---|
+| `wow-compile` | `./acore.sh compiler all` — clean full build |
+| `wow-build` | `./acore.sh compiler build` — incremental build |
+| `wow-update` | `git pull` here + `git pull` in `modules/mod-playerbots` |
+| `wow-updatemods` | `git pull` every module dir under `modules/` |
+| `wow-start` | `sudo bash /root/start.sh` — start both servers |
+| `wow-stop` | `sudo tmux kill-server` |
+| `wow-world` | `sudo tmux attach -t world-session` |
+| `wow-auth` | `sudo tmux attach -t auth-session` |
+| `wow-worldconf` | edit `env/dist/etc/worldserver.conf` |
+| `wow-pbconf` | edit `env/dist/etc/modules/playerbots.conf` |
+| `wow-ahconf` | edit `env/dist/etc/modules/mod_ahbot.conf` |
 
 ## Prerequisites
 
 - **MySQL 8.x** (the installer scripts target MySQL 8.4 LTS; `deps/` finds the system MySQL via
   `FindMySQL.cmake` and requires >= 8.0). `apps/installer/includes/os_configs/ubuntu.sh` installs
-  `mysql-server`; note that the local commit `24c4e5664` **commented out the MySQL download/install
-  block** in that script (a local divergence — see
-  [divergences-and-status.md](divergences-and-status.md)).
+  `mysql-server`; note that **a local commit commented out the MySQL download/install block** in
+  that script (a local divergence — see
+  [divergences-and-status.md](divergences-and-status.md)). MySQL is already installed and serving
+  the live databases.
 - **Toolchain**: CMake (the last build used CMake **3.28.3**), **clang** (default; `conf/dist/config.sh`
   sets `CCOMPILERC="/usr/bin/clang"`, `CCOMPILERCXX="/usr/bin/clang++"`) or **GCC ≥ 8.0** (enforced
   fatally in `src/cmake/compiler/gcc.cmake`; `GCC_EXPECTED_VERSION 8.0.0`; SSE2 is forced). MSVC,
@@ -140,7 +160,8 @@ Start `worldserver` (world port **8085**) and `authserver` (login port **3724**)
   auto-restarts a crashed server and supports GDB crash dumps.
 
 On first start the servers apply pending DB updates (see [data-layer.md](data-layer.md)) and
-generate their `.conf` files if missing.
+generate their `.conf` files if missing. Both servers are **currently running** under tmux
+(`world-session` / `auth-session`; see the operator aliases above).
 
 ## Docker
 
@@ -165,6 +186,6 @@ TOOLS_BUILD:STRING=none
 APPS_BUILD:STRING=all
 ```
 
-The result is installed and was run at some point: `env/dist/bin/{worldserver,authserver}`,
+The result is installed and **running**: `env/dist/bin/{worldserver,authserver}`,
 client data v16, generated configs, and logs (`Server.log`, `Playerbots.log`, `Errors.log`,
-`Auth.log`) are all present. Treat those as evidence only — do not run the binaries from here.
+`Auth.log`) are all present. Manage the running processes with the operator aliases above.

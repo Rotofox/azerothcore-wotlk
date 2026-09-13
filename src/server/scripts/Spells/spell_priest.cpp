@@ -99,22 +99,22 @@ class spell_pri_shadowfiend_scaling : public AuraScript
 
     void CalculateResistanceAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
     {
-        // xinef: shadowfiend inherits 40% of resistance from owner and 35% of armor (guessed)
+        // QoL: shadowfiend inherits 50% more resistance/armor (60% / 52.5%, was 40/35)
         if (Unit* owner = GetUnitOwner()->GetOwner())
         {
             SpellSchoolMask schoolMask = SpellSchoolMask(aurEff->GetSpellInfo()->Effects[aurEff->GetEffIndex()].MiscValue);
-            int32 modifier = schoolMask == SPELL_SCHOOL_MASK_NORMAL ? 35 : 40;
+            float modifier = schoolMask == SPELL_SCHOOL_MASK_NORMAL ? 52.5f : 60.0f;
             amount = CalculatePct(std::max<int32>(0, owner->GetResistance(schoolMask)), modifier);
         }
     }
 
     void CalculateStatAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
     {
-        // xinef: shadowfiend inherits 30% of intellect and 65% of stamina (guessed)
+        // QoL: shadowfiend inherits 50% more intellect / stamina (45% / 97.5%, was 30/65)
         if (Unit* owner = GetUnitOwner()->GetOwner())
         {
             Stats stat = Stats(aurEff->GetSpellInfo()->Effects[aurEff->GetEffIndex()].MiscValue);
-            amount = CalculatePct(std::max<int32>(0, owner->GetStat(stat)), stat == STAT_STAMINA ? 65 : 30);
+            amount = CalculatePct(std::max<int32>(0, owner->GetStat(stat)), stat == STAT_STAMINA ? 97.5f : 45);
         }
     }
 
@@ -124,17 +124,17 @@ class spell_pri_shadowfiend_scaling : public AuraScript
         if (Unit* owner = GetUnitOwner()->GetOwner())
         {
             int32 shadow = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_SHADOW);
-            amount = CalculatePct(std::max<int32>(0, shadow), 300); // xinef: deacrased to 300, including 15% from self buff
+            amount = CalculatePct(std::max<int32>(0, shadow), 450); // QoL: +50% (was 300, including 15% from self buff)
         }
     }
 
     void CalculateSPAmount(AuraEffect const*  /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
     {
-        // xinef: shadowfiend inherits 30% of SP
+        // QoL: shadowfiend inherits 50% more SP (45%, was 30%)
         if (Unit* owner = GetUnitOwner()->GetOwner())
         {
             int32 shadow = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_SHADOW);
-            amount = CalculatePct(std::max<int32>(0, shadow), 30);
+            amount = CalculatePct(std::max<int32>(0, shadow), 45);
 
             // xinef: Update appropriate player field
             if (owner->IsPlayer())

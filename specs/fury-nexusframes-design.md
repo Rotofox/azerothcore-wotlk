@@ -1,6 +1,9 @@
 # Fury System + NexusFrames — Design Spec
 
-Status: **ready to build**. Every decision below was confirmed through engineer discussion. Build the server module first (factory-shaped), then the addon (direct build).
+> **STATUS: implemented — built and shipped.** This spec is retained as the design record. For
+> current state see `documentation/modules.md` and `documentation/wow-handoff.md` §2.
+
+Status: **implemented**. Every decision below was confirmed through engineer discussion. Build the server module first (factory-shaped), then the addon (direct build).
 
 ---
 

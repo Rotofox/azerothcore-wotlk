@@ -1,6 +1,9 @@
 # Fury/NexusFrames v2 — Spec-Aware Roles, Empower-Not-Rewrite, Variant Prices, Addon Polish
 
-Status: **approved for implementation** (engineer + agent agreed; see the decision log).
+> **STATUS: implemented — built and shipped.** This spec is retained as the design record. For
+> current state see `documentation/modules.md` and `documentation/wow-handoff.md` §3.
+
+Status: **implemented** (engineer + agent agreed; see the decision log).
 Scope: mod-fury, mod-random-enchants, NexusFrames addon, variant price generator.
 Authoritative existing docs: `specs/fury-nexusframes-design.md`, `specs/db8e1683_item-quality-random-enchants.md`,
 `documentation/fury-nexusframes-handoff.md`.

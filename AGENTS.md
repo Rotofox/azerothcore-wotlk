@@ -4,13 +4,15 @@ AzerothCore is a C++ MMORPG server emulator for World of Warcraft 3.3.5a (WotLK)
 
 ## Agent rules
 
-- **Do not configure or build unless explicitly asked.** Builds are slow and rarely needed for code changes.
+- **Do not build unless explicitly asked.** Builds are slow and rarely needed for code changes.
 - **Never edit SQL files outside `data/sql/updates/pending_db_*/` unless explicitly requested.** `data/sql/base/`, `data/sql/archive/`, and `data/sql/updates/db_*/` are immutable.
+- **`documentation/` is the single source of truth for project state** (setup, architecture, modules, data layer, config, client pipeline, operator aliases). Keep it current in the same change that changes the thing it describes. Module `README`s and `specs/` are **not** authoritative (clones are upstream-owned; specs are historical). Never hardcode volatile facts (HEAD hashes, commit counts, "clean tree", per-module commit pins, module counts) in any doc — point at the live source. After touching anything this documentation covers, run `python3 apps/codestyle/check-docs.py`.
 - Formatting follows `.editorconfig`: UTF-8, LF, max 120 cols, trailing newline, no trailing whitespace; 4-space indent for C++ (tabs forbidden), 2-space for JSON/YAML/sh/ts/js.
 - **Prefer live-stack e2e to debug/validate player-visible behaviour** when a local auth+world+MySQL stack is available (protocol, combat, quests, loot, death, multi-bot). See `e2e/README.md` and AzerothGhost `e2e/LLM_GUIDE.md`. Do not invent e2e for pure unit-sized logic — see `.agents/docs/e2e-policy.md`.
 - **Scratch e2e only under `e2e/local/`** (gitignored). Never commit throwaway debug tests. Promote keepers into `e2e/suites/` or `e2e/smoke/`.
 - Planning docs go in `.agents/plans/<task-slug>/` (gitignored), named `<task-slug>.<TYPE>.md` (`PLAN`, `REQUIREMENTS`, `ANALYSIS`, …).
 - **Credit upstream authors.** Code, a mechanism, or data mirrored from another core (TrinityCore, cMaNGOS, …) is committed with `--author` naming the original commit's author (extra sources as `Co-authored-by`), even when rewritten against AC or confirmed by own sniffs; find them in the upstream file's commit history.
+- Always look at todos and close or mark as complete if finished. Do this after every task.
 
 ## Mandatory reading per task
 
@@ -25,6 +27,7 @@ Read the matching doc(s) BEFORE starting the task:
 - Self-reviewing, or opening or updating a PR → also `.agents/docs/self-review-rules.md`
 - Touching a subsystem that has a doc in `.agents/docs/systems/` → read that doc too
 - Writing, debugging, or changing live-stack e2e (`e2e/`) → `e2e/README.md`, `.agents/docs/e2e-policy.md`, and AzerothGhost `e2e/LLM_GUIDE.md` (scratch work → `e2e/local/`)
+- Understanding project state, modules, the data layer, the client patch pipeline, or writing/updating docs → `documentation/README.md`, then the matching page in `documentation/`
 - Capturing a lesson or adding/updating agent docs → `.agents/docs/README.md`
 
 ## Repository layout
@@ -45,8 +48,8 @@ Read the matching doc(s) BEFORE starting the task:
 
 ## Modules
 
-External modules live in `modules/`, each a subdir with its own `CMakeLists.txt`. Disable with `-DDISABLED_AC_MODULES="mod1;mod2"`. See `modules/how_to_make_a_module.md`.
+External modules live in `modules/`, each a subdir with a `src/` entry point (the loader globs `src/`; in this fork no module ships its own `CMakeLists.txt`). Some are independent git clones (never commit/push inside them), some are local untracked modules owned by this tree — see `documentation/modules.md`. Disable with `-DDISABLED_AC_MODULES="mod1;mod2"`. See `modules/how_to_make_a_module.md`.
 
 ## Persisting lessons
 
-When a user correction reveals a lesson that generalizes, offer to persist it into these docs (placement per `.agents/docs/README.md`): use the `/self-improve` skill if installed, otherwise suggest the user to install it and read this page: https://www.azerothcore.org/wiki/agentic-engineering
+When a user correction reveals a lesson that generalizes, offer to persist it into these docs (placement per `.agents/docs/README.md`): use the `/self-improve` skill if installed, otherwise suggest the user to install it and read this page: <https://www.azerothcore.org/wiki/agentic-engineering>

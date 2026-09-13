@@ -1,5 +1,9 @@
 # Plan: Create `documentation/` — onboarding docs for the AzerothCore WotLK Playerbot fork
 
+> **STATUS: implemented** — the `documentation/` set exists and is the source of truth. This spec is
+> the historical design record; the concrete counts/lists below (e.g. "seven modules") reflect the
+> tree when it was written. For current state see `documentation/README.md`.
+
 ## 1. Mission
 
 Create a NEW folder `documentation/` at the repo root (`/home/nexus-user/azerothcore-wotlk/documentation/`) containing a coherent set of markdown pages that get a future coding agent up to speed with this project: a fork of AzerothCore for Wrath of the Lich King (WotLK) private servers, with the Playerbot system merged in.

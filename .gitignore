@@ -142,6 +142,11 @@ compile_commands.json
 .pi
 adws
 
+# client-resources/ — local handoff area for the client patch (generated DBCs, addons, MPQ
+# staging, third-party reference dumps). Transferred to the client machine manually; not
+# versioned. See documentation/README.md (client pipeline).
+client-resources/
+
 # sssf runtime
 adws/adw_data/sessions/
 adws/adw_data/sssf.db*

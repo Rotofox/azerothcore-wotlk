@@ -1,6 +1,6 @@
 # Build Plan — Fury System (mod-fury) + NexusFrames addon
 
-Authoritative design: `specs/fury-nexusframes-design.md` (status: **ready to build**; every decision locked — implement as specified, do NOT re-design or re-litigate).
+Authoritative design: `specs/fury-nexusframes-design.md` (status: **implemented** — built and shipped; every decision locked — implement as specified, do NOT re-design or re-litigate).
 Verified-facts summary + gotchas: `documentation/fury-nexusframes-handoff.md`.
 This plan re-verified **every line number in the code** on 2026-08-17. Where the design's line numbers were wrong, the corrected values are below in **bold** — trust these.
 

@@ -1,0 +1,54 @@
+{
+  "_comment": "Machine-checkable project facts. Verified against the live tree by apps/codestyle/check-docs.py. Keep in sync with documentation/. Do NOT add volatile facts (HEAD hashes, commit counts, 'clean tree', per-module commit pins) here.",
+  "branch": "Playerbot",
+  "client_data_version": "v16",
+  "client_patch": "patch-4.MPQ",
+  "ports": {
+    "worldserver": 8085,
+    "authserver": 3724
+  },
+  "databases": [
+    "acore_auth",
+    "acore_characters",
+    "acore_world",
+    "acore_playerbots"
+  ],
+  "modules": {
+    "_comment": "clones = independent git clones (must have .git); local = untracked module dirs owned by this tree (must NOT have .git). Both are present under modules/ with a src/ directory.",
+    "clones": [
+      "mod-account-mounts",
+      "mod-ah-bot",
+      "mod-aoe-loot",
+      "mod-autobalance",
+      "mod-multibot-bridge",
+      "mod-no-hearthstone-cooldown",
+      "mod-playerbots",
+      "mod-random-enchants",
+      "mod-transmog"
+    ],
+    "local": [
+      "mod-collections",
+      "mod-fury",
+      "mod-qol",
+      "mod-talent"
+    ]
+  },
+  "client_addons": [
+    "NexusServer",
+    "QoLFlightPaths"
+  ],
+  "client_addons_reference": [
+    "NexusFrames"
+  ],
+  "source_of_truth_docs": [
+    "documentation/README.md",
+    "documentation/project-overview.md",
+    "documentation/repo-layout.md",
+    "documentation/build-and-run.md",
+    "documentation/architecture.md",
+    "documentation/data-layer.md",
+    "documentation/configuration.md",
+    "documentation/modules.md",
+    "documentation/divergences-and-status.md"
+  ]
+}

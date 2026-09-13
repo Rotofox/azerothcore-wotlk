@@ -1075,7 +1075,8 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
         SetMeleeDamageSchool(SpellSchools(cinfo->dmgschool));
     }
 
-    SetStatFlatModifier(UNIT_MOD_ARMOR, BASE_VALUE, float(petlevel * 50));
+    // QoL: pet base armor is 50% higher (75 per level, was 50)
+    SetStatFlatModifier(UNIT_MOD_ARMOR, BASE_VALUE, float(petlevel * 75));
 
     uint32 attackTime = BASE_ATTACK_TIME;
     if (!owner->IsClass(CLASS_HUNTER, CLASS_CONTEXT_PET) && cinfo->BaseAttackTime >= 1000)
@@ -1154,8 +1155,9 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
     {
         case HUNTER_PET:
             {
-                SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel - (petlevel / 4)));
-                SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel + (petlevel / 4)));
+                // QoL: hunter pet base weapon damage +50%
+                SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float((petlevel - (petlevel / 4)) * 1.5f));
+                SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float((petlevel + (petlevel / 4)) * 1.5f));
                 SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, uint32(sObjectMgr->GetXPForLevel(petlevel)* sWorld->getRate(RATE_XP_PET_NEXT_LEVEL)));
                 break;
             }
@@ -1168,8 +1170,9 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                 }
                 else
                 {
-                    SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel - (petlevel / 4)));
-                    SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel + (petlevel / 4)));
+                    // QoL: pet fallback weapon damage +50%
+                    SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float((petlevel - (petlevel / 4)) * 1.5f));
+                    SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float((petlevel + (petlevel / 4)) * 1.5f));
                 }
 
                 switch (GetEntry())

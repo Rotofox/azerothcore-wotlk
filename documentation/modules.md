@@ -1,13 +1,27 @@
 # The Module System and Installed Modules
 
-## Module sources are NOT in git (read this first)
+> **Source of truth.** This page — not the per-module `README.md` files — describes what is
+> installed and what it does. Several modules are upstream git clones whose `README`s are
+> upstream-owned and may be stale; the four local modules (`mod-fury`, `mod-qol`, `mod-talent`,
+> `mod-collections`) are ours but their `README`s can still lag. When they disagree with this page
+> or the tree, the tree wins — fix this page.
 
-All `modules/mod-*` directories are **independent git clones, ignored by the parent repo's
-`.gitignore`** (`/modules/*` ignored except `*.md`, `*.sh`, `CMakeLists.txt`, `*.h`, `*.cmake`).
-`git ls-files modules/` shows only the loader infrastructure — **zero module source files are
-tracked**. A fresh `git clone` of this repo will not contain the modules; you must re-clone each
-one into `modules/` (exactly what the upstream install flow does). In this tree all seven are
-present on disk, each with its own `.git`.
+## Module sources are NOT in the parent git repo (read this first)
+
+`modules/` is ignored by the parent repo's `.gitignore` (`/modules/*` ignored except `*.md`,
+`*.sh`, `CMakeLists.txt`, `*.h`, `*.cmake`). `git ls-files modules/` shows only the loader
+infrastructure — **zero module source files are tracked**. A fresh `git clone` of this repo does
+not contain the modules.
+
+There are two kinds of module directory in this tree:
+
+- **9 independent git clones** (each has its own `.git`): `mod-playerbots`, `mod-account-mounts`,
+  `mod-ah-bot`, `mod-aoe-loot`, `mod-autobalance`, `mod-no-hearthstone-cooldown`,
+  `mod-random-enchants`, `mod-multibot-bridge`, `mod-transmog`. Re-clone these after a fresh
+  checkout; update them with `wow-updatemods` (pull each). Never commit/push inside them from here.
+- **4 local, untracked module directories** (no `.git` — original code that lives only in this
+  working tree): `mod-fury`, `mod-qol`, `mod-talent`, `mod-collections`. They are not clones and
+  have no upstream; keep them as-is and do not try to `git pull` them.
 
 ## How the module system works
 
@@ -22,31 +36,40 @@ present on disk, each with its own `.git`.
   `src/<name>_loader.cpp` (e.g. `playerbots_loader.cpp` → `Addmod_playerbotsScripts()` →
   `AddPlayerbotsScripts()`). At startup worldserver calls
   `sScriptMgr->SetModulesLoader(AddModulesScripts)` (see [architecture.md](architecture.md)).
-- **No module ships a `CMakeLists.txt`** — the loader globs `src/` directly. Each module has a
-  mostly-empty `include.sh` stub (0 bytes for most; mod-playerbots 288 B, mod-no-hearthstone-cooldown
-  340 B) used by the installer/db-assembler.
+- **No module ships a `CMakeLists.txt`** — the loader globs `src/` directly. Some modules carry a
+  `conf.sh.dist` / `include.sh` stub used by the installer / db-assembler to register their SQL
+  paths.
 - **Hook registration**: modules override `ScriptMgr` hooks (`ScriptObject` subclasses registered
   via `Add<mod>Scripts()`), and can be queried through `ModuleMgr` (`src/server/game/Modules/`).
-- **Special case — `MOD_PLAYERBOTS`**: `modules/CMakeLists.txt` (lines ~85-93) detects
-  `mod-playerbots` and defines `MOD_PLAYERBOTS` for the `database` and `game-interface` targets;
-  17 core files are `#ifdef`-wired on it (see [architecture.md](architecture.md)).
+- **Special case — `MOD_PLAYERBOTS`**: `modules/CMakeLists.txt` detects `mod-playerbots` and
+  defines `MOD_PLAYERBOTS` for the `database` and `game-interface` targets; 17 core files are
+  `#ifdef`-wired on it (see [architecture.md](architecture.md)).
 
-## The seven installed modules
+## The installed modules
 
-| Module | Origin (remote @ commit) | What it does |
+**13 modules** are present. All are built and shipped in the current server.
+
+| Module | Kind | What it does |
 |---|---|---|
-| `mod-playerbots` | liyunfan1223/mod-playerbots @ `c3eecc0d` (2025-09-28) | AI player-like bots (see deep dive) |
-| `mod-account-mounts` | azerothcore/mod-account-mounts @ `65ea80f` (2025-03-18) | Account-wide mounts (learned mounts shared across characters) |
-| `mod-ah-bot` | NathanHandley/mod-ah-bot @ `eb7b34f` (2025-09-27) | Auction-house bot that posts/buys auctions to simulate an economy; **no SQL** ("Moved database configuration completely to config") |
-| `mod-aoe-loot` | azerothcore/mod-aoe-loot @ `1efc29f` (2025-02-26) | Loot all nearby corpses at once; ships `data/sql/db-world/base/aoe_loot_acore_string.sql` |
-| `mod-autobalance` | azerothcore/mod-autobalance @ `8382937` (2025-08-29) | Scales mob/instance difficulty to group size/level; carries `acore-module.json` v2.2.0 metadata; README warns master is "in beta" |
-| `mod-no-hearthstone-cooldown` | BytesGalore/mod-no-hearthstone-cooldown @ `832ef5e` (2025-02-25) | Removes the hearthstone cooldown (community fork of the AC module) |
-| `mod-random-enchants` | azerothcore/mod-random-enchants @ `02a2e0d` (2025-07-24) | Random enchantments on item drops; ships `data/sql/db-world/item_enchatment_random_tiers.sql` |
+| `mod-playerbots` | clone | AI player-like bots (see deep dive below) |
+| `mod-account-mounts` | clone | Account-wide mounts (learned mounts shared across characters) |
+| `mod-ah-bot` | clone | Auction-house bot that posts/buys auctions to simulate an economy; fully config-driven (no SQL) |
+| `mod-aoe-loot` | clone | Loot all nearby corpses at once; ships `data/sql/db-world/base/aoe_loot_acore_string.sql` |
+| `mod-autobalance` | clone | Scales mob/instance difficulty to group size/level; carries `acore-module.json` metadata |
+| `mod-no-hearthstone-cooldown` | clone | Removes the hearthstone cooldown (community fork of the AC module) |
+| `mod-random-enchants` | clone | Item Quality + scaled random-enchant system (variant swap + enchant matrix). Big local rework — see [data-layer.md](data-layer.md) and `specs/db8e1683_item-quality-random-enchants.md` |
+| `mod-multibot-bridge` | clone | Server half of the **MultiBot-Chatless** client addon (`MBOT` addon-message protocol) |
+| `mod-transmog` | clone | Appearance collection + transmog engine (collection mode) |
+| `mod-fury` | local | Account-wide **Fury** kill-based progression (see deep dive below) |
+| `mod-qol` | local | Quality-of-life: flight-path/inn/dungeon map pins + click-to-teleport, account-wide taxis, hunter QoL (pet fed, Auto Shot while moving), no reagents, offensive-spell autoattack, GM custom points |
+| `mod-talent` | local | Account-wide **Primeris** talent tree (universal soul tree; purchase/refund + aura application) |
+| `mod-collections` | local | Account-wide mounts/pets/transmog collections and the addon protocol; bridges into `mod-transmog` |
 
-Loader entry points present: `playerbots_loader.cpp`, `ah_bot_loader.cpp`, `AB_loader.cpp`,
-`aoe_loot_loader.cpp`, `NHC_loader.cpp`, `RE_loader.cpp`. Runtime configs:
-`env/dist/etc/modules/{playerbots,AutoBalance,mod_account_mount,mod_ahbot,mod_aoe_loot,mod_no_hearthstone_cooldown,random_enchants}.conf`
-(see [configuration.md](configuration.md)).
+Runtime configs live in `env/dist/etc/modules/` (one `.conf` + `.conf.dist` per module; see
+[configuration.md](configuration.md#other-module-configs-runtime-envdistetcmodules)).
+
+Loader entry points present include `playerbots_loader.cpp`, `ah_bot_loader.cpp`, `AB_loader.cpp`,
+`aoe_loot_loader.cpp`, `NHC_loader.cpp`, `RE_loader.cpp`, plus the loaders for the local modules.
 
 ## mod-playerbots deep dive
 
@@ -56,10 +79,7 @@ Loader entry points present: `playerbots_loader.cpp`, `ah_bot_loader.cpp`, `AB_l
   server", **based on [IKE3's Playerbots](https://github.com/ike3/mangosbot)**, and "requires a
   custom branch of AzerothCore to compile and run" — this one. It states **"This project is still
   under development"** and claims "excellent performance, even when running thousands of bots".
-- Module checkout: commit `c3eecc0d` ("Merge PR #1676 spec-tab-names", 2025-09-28), **2,210
-  commits** in the module's own history.
-- Size: **1,114 source files / 171,401 lines** under `src/` (measured with `wc -l` on
-  `*.cpp`/`*.h`).
+- Size: **~1,114 source files / ~171,400 lines** under `src/`.
 
 ### What it adds
 
@@ -67,37 +87,25 @@ Loader entry points present: `playerbots_loader.cpp`, `ah_bot_loader.cpp`, `AB_l
   configurable account/level/activity counts) and **alt-bots** (log in your own characters as
   bots via `PlayerbotMgr`).
 - **AI**: `PlayerbotAI`/`PlayerbotAIBase` with per-class **strategies** under
-  `src/strategy/<class>/` (deathknight, druid, hunter, mage, paladin, priest, rogue, shaman,
-  warlock, warrior) plus generic/triggers/values/actions/rpg; **dungeons** (`src/strategy/dungeons/`,
-  7,927 lines) and **raids** (`src/strategy/raids/`, 27,453 lines — naxxramas, ulduar, icecrown,
-  moltencore, aq20, …); bot **factory** (`src/factory/`, 6,690 lines); travel system
-  (`TravelMgr`/`TravelNode`).
+  `src/strategy/<class>/` plus generic/triggers/values/actions/rpg; **dungeons** and **raids**
+  (`src/strategy/dungeons/`, `src/strategy/raids/`); bot **factory** (`src/factory/`); travel
+  system (`TravelMgr`/`TravelNode`).
 - **Commands**: `.bot`, `.rndbot`, `.bg`, `.gtask`, `.link`/`.unlink`, `.account`, `.playerbots`,
   `.reset`, `.stack`, `.toggle`, `.debug`, `.pmon`, `.tick` (`src/cs_playerbots.cpp`).
 - Supporting systems: `GuildTaskMgr`, `ChatFilter`, `PlayerbotCommandServer`, `PerformanceMonitor`,
   `LootObjectStack`, `FleeManager`, `BroadcastHelper`, `PlaceholderHelper`, `RandomItemMgr`.
 
-### Source map (top level of `src/`)
-
-`PlayerbotAI*`, `PlayerbotMgr*`, `RandomPlayerbotMgr*`, `RandomPlayerbotFactory*`,
-`PlayerbotAIConfig*` (config parsing), `Playerbots.cpp`/`Playerbots.h` (module entry —
-`AddPlayerbotsScripts`), `playerbots_loader.cpp`, `cs_playerbots.cpp` (commands), `TravelMgr*`,
-`TravelNode*`, `Talentspec*`, `GuildTaskMgr*`, `ChatFilter*`, `BroadcastHelper*`, `ChatHelper*`,
-`Helpers*`, `AiFactory*`, `ServerFacade*`, `FleeManager*`, `LootObjectStack*`,
-`PerformanceMonitor*`, `PlayerbotSecurity*`, `PlayerbotTextMgr*`, `PlayerbotDbStore*`,
-`PlayerbotDungeonSuggestionMgr*`, `PlayerbotCommandServer*`, `RandomItemMgr*`, plus `strategy/`
-and `factory/` trees.
-
 ### Configuration
 
 `conf/playerbots.conf.dist` (sections listed in [configuration.md](configuration.md)) plus
 `conf/conf.sh.dist` (registers `sql/{auth,characters,world}/{base,updates}` paths for the db
-assembler). Runtime values in `env/dist/etc/modules/playerbots.conf`: `AiPlayerbot.Enabled = 1`,
-`RandomBotAccountCount = 240`, `RandomBotGuildCount = 20`, `RandomBotMaxLevel = 80`.
+assembler). Runtime values live in `env/dist/etc/modules/playerbots.conf` (see
+[configuration.md](configuration.md#playerbotsconf--key-settings-mod-playerbots)) — e.g.
+`AiPlayerbot.Enabled = 1`, `RandomBotAccountCount = 240`, `RandomBotGuildCount = 20`.
 
 ### Data
 
-Adds the **`acore_playerbots`** database (`data/sql/playerbots/` — create + 30 base tables:
+Adds the **`acore_playerbots`** database (`data/sql/playerbots/` — create + base tables:
 `ai_playerbot_texts(_chance)`, `playerbots_account_keys/links/type`, `playerbots_custom_strategy`,
 `playerbots_db_store`, `playerbots_dungeon_suggestion_*`, `playerbots_enchants`,
 `playerbots_equip_cache`, `playerbots_guild_tasks`, `playerbots_item_info_cache`,
@@ -119,14 +127,14 @@ and `world` updates. See [data-layer.md](data-layer.md).
 
 Sample `TODO`/`FIXME` markers in module source:
 
-- `src/BroadcastHelper.cpp:657` — `//TODO move texts to sql!`
-- `src/PlayerbotAI.cpp:643` — `// TODO: missing implementation to port`
-- `src/PlayerbotAI.cpp:3149` — `/// @TODO: Fix all calls to ApplySpellMod`
-- `src/strategy/values/SpellCastUsefulValue.cpp:43` — `// TODO: workaround`
-- `src/strategy/raids/icecrown/RaidIccActions.cpp:486` — a long comment admitting the plague
-  handling "is bugged … it is immpossible to handle plague atm the legit way"
-- `src/strategy/generic/BattlegroundStrategy.cpp:67` — `//TODO: Do Priorities`
+- `src/BroadcastHelper.cpp` — `//TODO move texts to sql!`
+- `src/PlayerbotAI.cpp` — `// TODO: missing implementation to port`
+- `src/PlayerbotAI.cpp` — `/// @TODO: Fix all calls to ApplySpellMod`
+- `src/strategy/values/SpellCastUsefulValue.cpp` — `// TODO: workaround`
+- `src/strategy/raids/icecrown/RaidIccActions.cpp` — a long comment admitting the plague handling
+  "is bugged … it is immpossible to handle plague atm the legit way"
+- `src/strategy/generic/BattlegroundStrategy.cpp` — `//TODO: Do Priorities`
 
 Also note the module's DB access style: `PlayerbotsDatabase` in the core does **not** use the
 `PREPARE_STATEMENT` macro used elsewhere in `src/server/database` — worth knowing before touching
-bot DB code. See [divergences-and-status.md](divergences-and-status.md) for the full status flags.
+bot DB code. See [divergences-and-status.md](divergences-and-status.md) for the full status.

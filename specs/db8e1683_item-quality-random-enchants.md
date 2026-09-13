@@ -1,7 +1,10 @@
 # Design Spec — Item Quality + Scaled Random-Enchant System
 
 AzerothCore WotLK (Playerbot fork) — module `modules/mod-random-enchants`
-Status: **ready to build**. Every decision below is final and carried verbatim from the engineer. Do not re-litigate; implement as specified. Open items (Section 5) each carry a recommended default — use it unless you have a strong reason and document the deviation in the code.
+> **STATUS: implemented — built and shipped.** This spec is retained as the design record. For
+> current state see `documentation/modules.md` and `documentation/data-layer.md`.
+
+Status: **implemented**. Every decision below is final and carried verbatim from the engineer. Do not re-litigate; implement as specified. Open items (Section 5) each carry a recommended default — use it unless you have a strong reason and document the deviation in the code.
 
 ---
 
@@ -29,7 +32,7 @@ Out of scope (do not do):
 - Implementing the module (this is the design spec; the builder implements).
 - Changing anything in core `src/server/game/`.
 - Loot-table surgery (variants are delivered by the module's item swap; `creature_loot_template` / `reference_loot_template` stay untouched).
-- Creating the client DBC patch (document the requirement only).
+- Creating the client DBC patch (was out of scope for the original design; it has since been **built** — see `client-resources/README.md`).
 - Committing or pushing anything.
 
 ### 1.3 Quality tiers
@@ -550,7 +553,7 @@ Existing options unchanged: `Enable`, `AnnounceOnLogin`, `OnLoginMessage`, `OnLo
 | 12a | Variant name generation                                                          | **Prefix map** (`Superior/Exquisite/Regal/Legendary/Mythic` + base name), not “(Epic)” suffix. Prefixes configurable via `RandomEnchants.VariantPrefixes`.                                                                                                                                                                                                                                                                                                                                                                                  |
 | 12b | Swap timing                                                                      | **Post-pickup** for v1 (hook `OnPlayerLootItem` fires after `SendNewItem`). Nuance: the loot window shows the base name because the swap happens after pickup; the bag/equip view shows the variant once the client refreshes (real variant row ⇒ cache query succeeds). A loot-roll-time swap (variant visible in the loot window) would require hooking the loot roll before item creation — no such hook exists in the four-event set; defer.                                                                                            |
 | 12c | Rates-table reload                                                               | **Read-per-roll** for v1 (each quality roll issues one indexed query against `mod_re_rates` keyed by (band, base_quality); each pool pick one against `mod_re_pool_rates`; plus `mod_re_class_archetype` / `mod_re_item_variants`). Cache-with-`.reload` is a later optimization.                                                                                                                                                                                                                                                          |
-| 12d | Client DBC patch for matrix enchant names                                        | **Document the requirement only** (do not build). Process: custom enchant IDs ≥ 100000 have no name strings in the client’s `SpellItemEnchantment.dbc`, so tooltips show nothing until the client DBC is patched — extract the DBC from the client MPQs (e.g., `common-2.mpq` / `patch-*.mpq` via MPQEditor/CASCExplorer), append the 2625 rows (or a name-only compact set), repack as a custom patch MPQ (`patch-4.mpq` or similar), ship to players. Server-side behavior is unaffected — enchants apply and display amounts regardless. |
+| 12d | Client DBC patch for matrix enchant names                                        | **Built** — the patch exists at `client-resources/SpellItemEnchantment.dbc` (generator `generate_enchant_dbc_patch.py`), shipped in `patch-4.MPQ`. Process (for reference): custom enchant IDs ≥ 100000 have no name strings in the client’s `SpellItemEnchantment.dbc`, so tooltips show nothing until the client DBC is patched — extract the DBC from the client MPQs (e.g., `common-2.mpq` / `patch-*.mpq` via MPQEditor/CASCExplorer), append the 2625 rows (or a name-only compact set), repack as a custom patch MPQ (`patch-4.mpq` or similar), ship to players. Server-side behavior is unaffected — enchants apply and display amounts regardless. |
 | 12e | Matrix realization of `rand(min, max)` (discovered core constraint, Section 2.5) | **Pre-rolled magnitude ladder**: 5 evenly-spaced rungs per (band × stat × tier), uniform rung pick = discrete `urand(min,max)`; the row’s `EffectPointsMin` is the applied amount (core ignores `EffectPointsMax`). Rungs configurable via `RandomEnchants.EnchantMatrixRungs`.                                                                                                                                                                                                                                                             |
 | 12f | Variant ItemLevel                                                                | **Unchanged** (copied from base). Decision 4’s mutation list is “Quality + scaled stats (+ name)” only; keeping ilvl equal keeps the enchant band tied to the base item. Scaling ilvl per tier would re-bucket bands and is a later tuning lever.                                                                                                                                                                                                                                                                                           |
 | 12g | Statless-seed tier scaling                                                       | **Apply the tier multiplier** to the seeded `stat_value` (`round(urand(bandMin,bandMax) × tierMult)`), consistent with decision 4 (“each stat value”) — higher variants are strictly stronger. Note: at T5 the top band can reach ~1140; acceptable for a fun server, tunable via bands/pool.                                                                                                                                                                                                                                               |
@@ -579,6 +582,6 @@ Existing options unchanged: `Enable`, `AnnounceOnLogin`, `OnLoginMessage`, `OnLo
 
 - No changes to core `src/server/game/` (hook signatures, DBC loader, item/enchant application all stay as-is).
 - No `creature_loot_template` / `reference_loot_template` edits — variants come from the module swap only.
-- No client DBC patch artifact — requirement documented (12d), patch not built.
+- Client DBC patch artifact: **built** (`client-resources/SpellItemEnchantment.dbc`, generator `generate_enchant_dbc_patch.py`); shipped in `patch-4.MPQ`.
 - No commits/pushes/pulls from `modules/mod-random-enchants`.
 - `item_enchatment_random_tiers.sql` (legacy pool) is retained, not deleted; only no longer queried by default.

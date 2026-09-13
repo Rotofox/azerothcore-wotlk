@@ -377,32 +377,32 @@ class spell_dru_treant_scaling : public AuraScript
 
     void CalculateResistanceAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
     {
-        // xinef: treant inherits 40% of resistance from owner and 35% of armor (guessed)
+        // QoL: treant inherits 50% more resistance/armor (60% / 52.5%, was 40/35)
         if (Unit* owner = GetUnitOwner()->GetOwner())
         {
             SpellSchoolMask schoolMask = SpellSchoolMask(aurEff->GetSpellInfo()->Effects[aurEff->GetEffIndex()].MiscValue);
-            int32 modifier = schoolMask == SPELL_SCHOOL_MASK_NORMAL ? 35 : 40;
+            float modifier = schoolMask == SPELL_SCHOOL_MASK_NORMAL ? 52.5f : 60.0f;
             amount = CalculatePct(std::max<int32>(0, owner->GetResistance(schoolMask)), modifier);
         }
     }
 
     void CalculateStatAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
     {
-        // xinef: treant inherits 30% of intellect / stamina (guessed)
+        // QoL: treant inherits 50% more intellect / stamina (45%, was 30%)
         if (Unit* owner = GetUnitOwner()->GetOwner())
         {
             Stats stat = Stats(aurEff->GetSpellInfo()->Effects[aurEff->GetEffIndex()].MiscValue);
-            amount = CalculatePct(std::max<int32>(0, owner->GetStat(stat)), 30);
+            amount = CalculatePct(std::max<int32>(0, owner->GetStat(stat)), 45);
         }
     }
 
     void CalculateAPAmount(AuraEffect const*  /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
     {
-        // xinef: treant inherits 105% of SP as AP - 15% of damage increase per hit
+        // QoL: treant inherits 50% more SP as AP (157.5%, was 105%)
         if (Unit* owner = GetUnitOwner()->GetOwner())
         {
             int32 nature = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_NATURE);
-            amount = CalculatePct(std::max<int32>(0, nature), 105);
+            amount = CalculatePct(std::max<int32>(0, nature), 157.5f);
 
             // xinef: brambles talent
             if (AuraEffect const* bramblesEff = owner->GetAuraEffect(SPELL_AURA_ADD_FLAT_MODIFIER, SPELLFAMILY_DRUID, 53, 2))
@@ -412,11 +412,11 @@ class spell_dru_treant_scaling : public AuraScript
 
     void CalculateSPAmount(AuraEffect const*  /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
     {
-        // xinef: treant inherits 15% of SP
+        // QoL: treant inherits 50% more SP (22.5%, was 15%)
         if (Unit* owner = GetUnitOwner()->GetOwner())
         {
             int32 nature = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_NATURE);
-            amount = CalculatePct(std::max<int32>(0, nature), 15);
+            amount = CalculatePct(std::max<int32>(0, nature), 22.5f);
 
             // xinef: Update appropriate player field
             if (owner->IsPlayer())

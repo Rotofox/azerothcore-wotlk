@@ -1,6 +1,6 @@
 # Build Plan — Item Quality + Scaled Random-Enchant System (`modules/mod-random-enchants`)
 
-Authoritative design: `specs/db8e1683_item-quality-random-enchants.md` (status: **ready to build**).
+Authoritative design: `specs/db8e1683_item-quality-random-enchants.md` (status: **implemented** — built and shipped).
 This plan translates that spec into concrete work. **Do not re-design or re-litigate the spec.**
 Where this plan states a value the spec already states, the spec wins; where this plan resolves an
 implicit point, the resolution is marked **[RESOLVED]** and must be implemented as stated (with a

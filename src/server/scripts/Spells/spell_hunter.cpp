@@ -176,11 +176,11 @@ class spell_hun_generic_scaling : public AuraScript
 
     void CalculateResistanceAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
     {
-        // xinef: pet inherits 40% of resistance from owner and 35% of armor
+        // QoL: pet inherits 50% more resistance/armor from its owner (60% / 52.5%, was 40/35)
         if (Unit* owner = GetUnitOwner()->GetOwner())
         {
             SpellSchoolMask schoolMask = SpellSchoolMask(aurEff->GetSpellInfo()->Effects[aurEff->GetEffIndex()].MiscValue);
-            int32 modifier = schoolMask == SPELL_SCHOOL_MASK_NORMAL ? 35 : 40;
+            float modifier = schoolMask == SPELL_SCHOOL_MASK_NORMAL ? 52.5f : 60.0f;
             amount = CalculatePct(std::max<int32>(0, owner->GetResistance(schoolMask)), modifier);
             if (owner->HasAura(SPELL_HUNTER_PET_LEGGINGS_OF_BEAST_MASTERY) && schoolMask == SPELL_SCHOOL_MASK_NORMAL)
             {
@@ -193,8 +193,8 @@ class spell_hun_generic_scaling : public AuraScript
     {
         if (Unit* owner = GetUnitOwner()->GetOwner())
         {
-            // xinef: by default pet inherits 45% of stamina
-            int32 modifier = 45;
+            // QoL: pet inherits 50% more stamina from its owner (67.5%, was 45%)
+            float modifier = 67.5f;
 
             // xinef: Wild Hunt bonus for stamina
             if (AuraEffect* wildHuntEff = GetUnitOwner()->GetDummyAuraEffect(SPELLFAMILY_PET, 3748, EFFECT_0))
@@ -212,8 +212,8 @@ class spell_hun_generic_scaling : public AuraScript
     {
         if (Unit* owner = GetUnitOwner()->GetOwner())
         {
-            // xinef: by default 22% of RAP
-            int32 modifier = 22;
+            // QoL: pet inherits 50% more attack power from its owner (33%, was 22%)
+            float modifier = 33.0f;
 
             // xinef: Wild Hunt bonus for AP
             if (AuraEffect* wildHuntEff = GetUnitOwner()->GetDummyAuraEffect(SPELLFAMILY_PET, 3748, EFFECT_1))
@@ -237,8 +237,8 @@ class spell_hun_generic_scaling : public AuraScript
     {
         if (Unit* owner = GetUnitOwner()->GetOwner())
         {
-            // xinef: by default 12.87% of RAP
-            float modifier = 12.87f;
+            // QoL: pet inherits 50% more spell power from its owner (19.305%, was 12.87%)
+            float modifier = 19.305f;
 
             // xinef: Wild Hunt bonus for AP
             if (AuraEffect* wildHuntEff = GetUnitOwner()->GetDummyAuraEffect(SPELLFAMILY_PET, 3748, EFFECT_1))

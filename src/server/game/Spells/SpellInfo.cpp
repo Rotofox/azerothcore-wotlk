@@ -27,6 +27,8 @@
 #include "SpellAuraDefines.h"
 #include "SpellAuraEffects.h"
 #include "SpellMgr.h"
+#include "World.h"
+#include "WorldConfig.h"
 
 uint32 GetTargetFlagMask(SpellTargetObjectTypes objType)
 {
@@ -417,8 +419,17 @@ int32 SpellEffectInfo::CalcValue(Unit const* caster, int32 const* bp, Unit const
     if (caster && basePointsPerLevel != 0.0f)
     {
         int32 level = int32(caster->GetLevel());
-        if (level > int32(_spellInfo->MaxLevel) && _spellInfo->MaxLevel > 0)
-            level = int32(_spellInfo->MaxLevel);
+
+        // QoL: the top rank of a spell chain has no higher rank to move to. On a realm configured
+        // above the expansion cap, let it keep growing up to that cap instead of freezing at the
+        // spell's own MaxLevel. Lower ranks keep their smaller caps, so this cannot be exploited.
+        static constexpr int32 WOTLK_MAX_LEVEL = 80;
+        int32 spellMaxLevel = int32(_spellInfo->MaxLevel);
+        if (spellMaxLevel >= WOTLK_MAX_LEVEL && sSpellMgr->GetNextSpellInChain(_spellInfo->Id) == 0)
+            spellMaxLevel = int32(sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL));
+
+        if (level > spellMaxLevel && spellMaxLevel > 0)
+            level = spellMaxLevel;
         else if (level < int32(_spellInfo->BaseLevel))
             level = int32(_spellInfo->BaseLevel);
 

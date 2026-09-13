@@ -21,9 +21,58 @@
 #include "ObjectAccessor.h"
 #include "Opcodes.h"
 #include "Player.h"
+#include "SpellInfo.h"
+#include "SpellMgr.h"
 #include "Vehicle.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
+
+// QoL (documentation/wow-handoff.md §9.2): the 3.3.5 client will not start a
+// ranged auto-repeat cast (Auto Shot 75, wand Shoot 5019, ...) while the player
+// is moving - it holds the cast back until movement stops. CMSG_ATTACKSWING is
+// the one attack signal the client *does* send while running (melee auto-attack
+// is usable on the move), so when a ranged-weapon player asks to attack a target
+// inside their ranged auto-attack's reach, start that auto-repeat server-side.
+// Unit::_UpdateAutoRepeatSpell then drives the shots, and the Spell.cpp movement
+// exemptions for spell 75 keep it alive while the player keeps moving (kiting).
+static void StartRangedAutoAttack(Player* player, Unit* victim)
+{
+    if (!player || !victim || !player->IsAlive() || !victim->IsAlive())
+        return;
+
+    // Already auto-shooting - never restart (a restart would fire a free shot).
+    if (player->GetCurrentSpell(CURRENT_AUTOREPEAT_SPELL))
+        return;
+
+    // Needs a ranged weapon in the ranged slot.
+    if (!player->GetWeaponForAttack(RANGED_ATTACK))
+        return;
+
+    // Find the player's own ranged auto-repeat spell (Auto Shot / Shoot / ...).
+    SpellInfo const* autoRepeat = nullptr;
+    for (auto const& [spellId, playerSpell] : player->GetSpellMap())
+    {
+        if (!playerSpell || playerSpell->State == PLAYERSPELL_REMOVED)
+            continue;
+
+        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+        if (spellInfo && spellInfo->IsAutoRepeatRangedSpell())
+        {
+            autoRepeat = spellInfo;
+            break;
+        }
+    }
+
+    if (!autoRepeat)
+        return; // this class has no ranged auto-attack
+
+    // Only for targets inside the ranged auto-attack's reach; a target that is
+    // out of ranged range keeps its normal (melee) attack behaviour.
+    if (!player->IsWithinDistInMap(victim, autoRepeat->GetMaxRange(false, player)))
+        return;
+
+    player->CastSpell(victim, autoRepeat, TRIGGERED_NONE);
+}
 
 void WorldSession::HandleAttackSwingOpcode(WorldPacket& recvData)
 {
@@ -63,6 +112,11 @@ void WorldSession::HandleAttackSwingOpcode(WorldPacket& recvData)
     }
 
     _player->Attack(pEnemy, true);
+
+    // QoL: also start the ranged auto-attack, so "attack this target" works for
+    // ranged-weapon classes even while moving (the client withholds the Auto Shot
+    // cast while running). No-op for melee-only classes / out-of-range targets.
+    StartRangedAutoAttack(_player, pEnemy);
 }
 
 void WorldSession::HandleAttackStopOpcode(WorldPacket& /*recvData*/)

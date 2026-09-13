@@ -3562,7 +3562,8 @@ SpellCastResult Spell::prepare(SpellCastTargets const* targets, AuraEffect const
 
     // don't allow channeled spells / spells with cast time to be casted while moving
     // (even if they are interrupted on moving, spells with almost immediate effect get to have their effect processed before movement interrupter kicks in)
-    if ((m_spellInfo->IsChanneled() || m_casttime) && m_caster->IsPlayer() && m_caster->isMoving() && m_spellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_MOVEMENT && !IsTriggered())
+    // QoL: Hunter Auto Shot (75) is exempt — its cast time is the weapon speed and must be usable while moving (kiting).
+    if ((m_spellInfo->IsChanneled() || m_casttime) && m_caster->IsPlayer() && m_caster->isMoving() && m_spellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_MOVEMENT && !IsTriggered() && m_spellInfo->Id != 75)
     {
         // 1. Has casttime, 2. Or doesn't have flag to allow action during channel
         if (m_casttime || !m_spellInfo->IsActionAllowedChannel())
@@ -5820,8 +5821,9 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* /*param1*/, uint32* /*para
     if (m_caster->IsPlayer() && m_caster->ToPlayer()->isMoving() && !IsTriggered())
     {
         // skip stuck spell to allow use it in falling case and apply spell limitations at movement
+        // QoL: Hunter Auto Shot (75) may be started while moving (kiting).
         if ((!m_caster->HasUnitMovementFlag(MOVEMENTFLAG_FALLING_FAR) || m_spellInfo->Effects[0].Effect != SPELL_EFFECT_STUCK) &&
-                (IsAutoRepeat() || (m_spellInfo->AuraInterruptFlags & AURA_INTERRUPT_FLAG_NOT_SEATED) != 0))
+                (IsAutoRepeat() || (m_spellInfo->AuraInterruptFlags & AURA_INTERRUPT_FLAG_NOT_SEATED) != 0) && m_spellInfo->Id != 75)
             return SPELL_FAILED_MOVING;
     }
 
@@ -7175,10 +7177,11 @@ SpellCastResult Spell::CheckRange(bool strict)
         }
 
         // Check min range - for ranged spells, min range is the spell's min range + melee range (no leeway)
+        // QoL: Hunter Auto Shot (75) has no minimum range — usable at point blank.
         if (range_type == SPELL_RANGE_RANGED)
         {
             float minRangeCombined = min_range + m_caster->GetMeleeRange(target);
-            if (m_caster->IsWithinRange(target, minRangeCombined))
+            if (m_spellInfo->Id != 75 && m_caster->IsWithinRange(target, minRangeCombined))
                 return SPELL_FAILED_TOO_CLOSE;
         }
         else if (min_range > 0 && m_caster->IsWithinCombatRange(target, min_range))

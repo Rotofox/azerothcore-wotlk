@@ -210,31 +210,31 @@ class spell_sha_feral_spirit_scaling : public AuraScript
 
     void CalculateResistanceAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
     {
-        // xinef: feral spirit inherits 40% of resistance from owner and 35% of armor
+        // QoL: feral spirit inherits 50% more resistance/armor (60% / 52.5%, was 40/35)
         if (Unit* owner = GetUnitOwner()->GetOwner())
         {
             SpellSchoolMask schoolMask = SpellSchoolMask(aurEff->GetSpellInfo()->Effects[aurEff->GetEffIndex()].MiscValue);
-            int32 modifier = schoolMask == SPELL_SCHOOL_MASK_NORMAL ? 35 : 40;
+            float modifier = schoolMask == SPELL_SCHOOL_MASK_NORMAL ? 52.5f : 60.0f;
             amount = CalculatePct(std::max<int32>(0, owner->GetResistance(schoolMask)), modifier);
         }
     }
 
     void CalculateStatAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
     {
-        // xinef: by default feral spirit inherits 30% of stamina
+        // QoL: feral spirit inherits 50% more stamina (45%, was 30%)
         if (Unit* owner = GetUnitOwner()->GetOwner())
         {
             Stats stat = Stats(aurEff->GetSpellInfo()->Effects[aurEff->GetEffIndex()].MiscValue);
-            amount = CalculatePct(std::max<int32>(0, owner->GetStat(stat)), 30);
+            amount = CalculatePct(std::max<int32>(0, owner->GetStat(stat)), 45);
         }
     }
 
     void CalculateAPAmount(AuraEffect const*  /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
     {
-        // xinef: by default feral spirit inherits 30% of AP
+        // QoL: feral spirit inherits 50% more AP (45%, was 30%)
         if (Unit* owner = GetUnitOwner()->GetOwner())
         {
-            int32 modifier = 30;
+            float modifier = 45.0f;
             if (AuraEffect const* gofsEff = owner->GetAuraEffect(SPELL_SHAMAN_GLYPH_OF_FERAL_SPIRIT, EFFECT_0))
                 modifier += gofsEff->GetAmount();
 
@@ -244,10 +244,10 @@ class spell_sha_feral_spirit_scaling : public AuraScript
 
     void CalculateSPAmount(AuraEffect const*  /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
     {
-        // xinef: by default feral spirit inherits 30% of AP as SP
+        // QoL: feral spirit inherits 50% more AP as SP (45%, was 30%)
         if (Unit* owner = GetUnitOwner()->GetOwner())
         {
-            int32 modifier = 30;
+            float modifier = 45.0f;
             if (AuraEffect const* gofsEff = owner->GetAuraEffect(SPELL_SHAMAN_GLYPH_OF_FERAL_SPIRIT, EFFECT_0))
                 modifier += gofsEff->GetAmount();
 
@@ -325,22 +325,22 @@ class spell_sha_fire_elemental_scaling : public AuraScript
 
     void CalculateResistanceAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
     {
-        // xinef: fire elemental inherits 40% of resistance from owner and 35% of armor
+        // QoL: fire elemental inherits 50% more resistance/armor (60% / 52.5%, was 40/35)
         if (Unit* owner = GetUnitOwner()->GetOwner())
         {
             SpellSchoolMask schoolMask = SpellSchoolMask(aurEff->GetSpellInfo()->Effects[aurEff->GetEffIndex()].MiscValue);
-            int32 modifier = schoolMask == SPELL_SCHOOL_MASK_NORMAL ? 35 : 40;
+            float modifier = schoolMask == SPELL_SCHOOL_MASK_NORMAL ? 52.5f : 60.0f;
             amount = CalculatePct(std::max<int32>(0, owner->GetResistance(schoolMask)), modifier);
         }
     }
 
     void CalculateStatAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
     {
-        // xinef: fire elemental inherits 30% of intellect / stamina
+        // QoL: fire elemental inherits 50% more intellect / stamina (45%, was 30%)
         if (Unit* owner = GetUnitOwner()->GetOwner())
         {
             Stats stat = Stats(aurEff->GetSpellInfo()->Effects[aurEff->GetEffIndex()].MiscValue);
-            amount = CalculatePct(std::max<int32>(0, owner->GetStat(stat)), 30);
+            amount = CalculatePct(std::max<int32>(0, owner->GetStat(stat)), 45);
         }
     }
 
@@ -350,17 +350,17 @@ class spell_sha_fire_elemental_scaling : public AuraScript
         if (Unit* owner = GetUnitOwner()->GetOwner())
         {
             int32 fire = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_FIRE);
-            amount = CalculatePct(std::max<int32>(0, fire), (GetUnitOwner()->GetEntry() == NPC_FIRE_ELEMENTAL ? 300 : 150));
+            amount = CalculatePct(std::max<int32>(0, fire), (GetUnitOwner()->GetEntry() == NPC_FIRE_ELEMENTAL ? 450 : 225));
         }
     }
 
     void CalculateSPAmount(AuraEffect const*  /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
     {
-        // xinef: fire elemental inherits 100% of SP
+        // QoL: fire elemental inherits 50% more SP (150%, was 100%)
         if (Unit* owner = GetUnitOwner()->GetOwner())
         {
             int32 fire = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_FIRE);
-            amount = CalculatePct(std::max<int32>(0, fire), 100);
+            amount = CalculatePct(std::max<int32>(0, fire), 150);
 
             // xinef: Update appropriate player field
             if (owner->IsPlayer())

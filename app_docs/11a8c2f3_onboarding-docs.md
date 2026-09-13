@@ -35,7 +35,7 @@ docs say so.
 | `documentation/architecture.md` | The two processes (authserver 3724 / worldserver 8085), worldserver startup pipeline, `src/common/`, `src/server/{shared,database,game}/`, the script/module hook mechanism, the 9 `OnPlayerbot*` ScriptMgr hooks, tools, threading, tests |
 | `documentation/data-layer.md` | The four databases (auth, characters, world + mod-playerbots' `acore_playerbots`), `data/sql/` layout, `dbimport` update flow and `Updates.*` settings, module SQL, client data files (dbc/maps/vmaps/mmaps/Cameras) |
 | `documentation/configuration.md` | `.conf.dist` templates vs generated `env/dist/etc/*.conf`, key `worldserver.conf` / `authserver.conf` / `playerbots.conf` settings (with runtime values), module configs, logging appenders |
-| `documentation/modules.md` | Module system mechanics (CMake discovery/loader, `MOD_PLAYERBOTS` special case), the 7 installed modules with origins, and a deep dive on mod-playerbots (identity, AI/strategies, commands, data, wiring, known rough edges) |
+| `documentation/modules.md` | Module system mechanics (CMake discovery/loader, `MOD_PLAYERBOTS` special case), the installed modules with origins, and a deep dive on mod-playerbots (identity, AI/strategies, commands, data, wiring, known rough edges) |
 | `documentation/divergences-and-status.md` | Fork lineage vs upstream, the fork's core-side changes, local state, and the explicit unfinished/broken list (dead TrackingModule, playerbots dev-status, empty pending-DB dirs, template/runtime config drift) |
 
 **Supporting (agent tooling, not server code):**

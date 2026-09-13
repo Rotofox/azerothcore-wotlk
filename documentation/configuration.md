@@ -104,7 +104,13 @@ connections, chat, logs). Key options:
 | `mod_ahbot.conf` | mod-ah-bot | auction-house bot (huge `AuctionHouseBot.*` config tree incl. `AdvancedPricing.*`; no SQL — fully config-driven) |
 | `mod_aoe_loot.conf` | mod-aoe-loot | AoE looting |
 | `mod_no_hearthstone_cooldown.conf` | mod-no-hearthstone-cooldown | removes HS cooldown |
-| `random_enchants.conf` | mod-random-enchants | random item enchantments |
+| `random_enchants.conf` | mod-random-enchants | item quality + scaled random enchants |
+| `MultiBotBridge.conf` | mod-multibot-bridge | MultiBot-Chatless bridge |
+| `fury.conf` | mod-fury | account-wide Fury progression (local module) |
+| `qol.conf` | mod-qol | QoL feature toggles (local module) |
+| `talent.conf` | mod-talent | account-wide Primeris talent tree (local module) |
+| `collections.conf` | mod-collections | account-wide collections (local module) |
+| `transmog.conf` | mod-transmog | appearance/transmog engine |
 
 Each also has a `.conf.dist` template alongside it.
 

@@ -4,7 +4,7 @@
 
 The module was reworked from the old enchant-only behavior into the full
 "Item Quality + Scaled Random-Enchant System" specified in
-`specs/db8e1683_item-quality-random-enchants.md` (status: ready to build; the
+`specs/db8e1683_item-quality-random-enchants.md` (status: implemented; the
 build plan is `specs/9f6e3f7c_random-enchants-build.md`). On every awarded item
 (loot pickup, profession/create, quest reward, group-roll reward) the award
 flow now runs **two independent rolls**:

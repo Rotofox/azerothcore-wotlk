@@ -5486,13 +5486,15 @@ class spell_pet_intellect_spirit_resilience_scaling : public AuraScript
     void CalculateIntellectAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
     {
         if (Player* modOwner = GetUnitOwner()->GetSpellModOwner())
-            amount = static_cast<int32>(CalculatePct(std::max<float>(0, modOwner->GetStat(STAT_INTELLECT)), 30));
+            // QoL: pet inherits 50% more intellect (45%, was 30%)
+            amount = static_cast<int32>(CalculatePct(std::max<float>(0, modOwner->GetStat(STAT_INTELLECT)), 45));
     }
 
     void CalculateSpiritAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
     {
         if (Player* modOwner = GetUnitOwner()->GetSpellModOwner())
-            amount = static_cast<int32>(CalculatePct(std::max<float>(0, modOwner->GetStat(STAT_SPIRIT)), 30));
+            // QoL: pet inherits 50% more spirit (45%, was 30%)
+            amount = static_cast<int32>(CalculatePct(std::max<float>(0, modOwner->GetStat(STAT_SPIRIT)), 45));
     }
 
     void HandleEffectApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)

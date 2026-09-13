@@ -309,11 +309,11 @@ class spell_warl_generic_scaling : public AuraScript
 
     void CalculateResistanceAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
     {
-        // pet inherits 40% of resistance from owner and 35% of armor
+        // QoL: pet inherits 50% more resistance/armor (60% / 52.5%, was 40/35)
         if (Unit* owner = GetUnitOwner()->GetOwner())
         {
             SpellSchoolMask schoolMask = SpellSchoolMask(aurEff->GetSpellInfo()->Effects[aurEff->GetEffIndex()].MiscValue);
-            int32 modifier = schoolMask == SPELL_SCHOOL_MASK_NORMAL ? 35 : 40;
+            float modifier = schoolMask == SPELL_SCHOOL_MASK_NORMAL ? 52.5f : 60.0f;
             amount = CalculatePct(std::max<int32>(0, owner->GetResistance(schoolMask)), modifier);
             if (owner->HasAura(SPELL_WARLOCK_PET_VOID_STAR_TALISMAN) && schoolMask != SPELL_SCHOOL_MASK_NORMAL)
             {
@@ -325,11 +325,11 @@ class spell_warl_generic_scaling : public AuraScript
 
     void CalculateStatAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
     {
-        // by default warlock pet inherits 75% of stamina and 30% of intellect
+        // QoL: warlock pet inherits 50% more stamina / intellect (112.5% / 45%, was 75/30)
         if (Unit* owner = GetUnitOwner()->GetOwner())
         {
             Stats stat = Stats(aurEff->GetSpellInfo()->Effects[aurEff->GetEffIndex()].MiscValue);
-            int32 modifier = stat == STAT_STAMINA ? 75 : 30;
+            float modifier = stat == STAT_STAMINA ? 112.5f : 45.0f;
             amount = CalculatePct(std::max<int32>(0, owner->GetStat(stat)), modifier);
         }
     }
@@ -344,7 +344,7 @@ class spell_warl_generic_scaling : public AuraScript
                 int32 fire  = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_FIRE);
                 int32 shadow = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_SHADOW);
                 int32 maximum  = (fire > shadow) ? fire : shadow;
-                amount = CalculatePct(std::max<int32>(0, maximum), 57);
+                amount = CalculatePct(std::max<int32>(0, maximum), 85.5f);
 
                 // Glyph of felguard, 99% sure this is a HACK
                 if (pet->GetEntry() == NPC_FELGUARD)
@@ -432,11 +432,11 @@ class spell_warl_infernal_scaling : public AuraScript
 
     void CalculateResistanceAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
     {
-        // xinef: pet inherits 40% of resistance from owner and 35% of armor
+        // QoL: infernal inherits 50% more resistance/armor (60% / 52.5%, was 40/35)
         if (Unit* owner = GetUnitOwner()->GetOwner())
         {
             SpellSchoolMask schoolMask = SpellSchoolMask(aurEff->GetSpellInfo()->Effects[aurEff->GetEffIndex()].MiscValue);
-            int32 modifier = schoolMask == SPELL_SCHOOL_MASK_NORMAL ? 35 : 40;
+            float modifier = schoolMask == SPELL_SCHOOL_MASK_NORMAL ? 52.5f : 60.0f;
             amount = CalculatePct(std::max<int32>(0, owner->GetResistance(schoolMask)), modifier);
             if (owner->HasAura(SPELL_WARLOCK_PET_VOID_STAR_TALISMAN) && schoolMask != SPELL_SCHOOL_MASK_NORMAL)
             {
@@ -448,11 +448,11 @@ class spell_warl_infernal_scaling : public AuraScript
 
     void CalculateStatAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
     {
-        // xinef: by default warlock pet inherits 75% of stamina and 30% of intellect
+        // QoL: infernal inherits 50% more stamina / intellect (112.5% / 45%, was 75/30)
         if (Unit* owner = GetUnitOwner()->GetOwner())
         {
             Stats stat = Stats(aurEff->GetSpellInfo()->Effects[aurEff->GetEffIndex()].MiscValue);
-            int32 modifier = stat == STAT_STAMINA ? 75 : 30;
+            float modifier = stat == STAT_STAMINA ? 112.5f : 45.0f;
             amount = CalculatePct(std::max<int32>(0, owner->GetStat(stat)), modifier);
         }
     }
@@ -465,7 +465,7 @@ class spell_warl_infernal_scaling : public AuraScript
             int32 fire  = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_FIRE);
             int32 shadow = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_SHADOW);
             int32 maximum  = (fire > shadow) ? fire : shadow;
-            amount = CalculatePct(std::max<int32>(0, maximum), 57);
+            amount = CalculatePct(std::max<int32>(0, maximum), 85.5f);
         }
     }
 

@@ -13,16 +13,16 @@ The project is the upstream AzerothCore core plus the core-side changes required
 
 ```
 azerothcore/azerothcore-wotlk (upstream master)
-   └── liyunfan1223/azerothcore-wotlk  branch "Playerbot"   ← origin remote
-          └── this checkout (2 local commits on top)
+   └── liyunfan1223/azerothcore-wotlk  branch "Playerbot"   ← origin remote (now under the mod-playerbots org)
+          └── this checkout (local custom commits + uncommitted custom work)
 ```
 
-- Upstream AzerothCore master is merged into the `Playerbot` branch repeatedly; the latest merge
-  is `f67b86df8` (2025-09-28), merging upstream `5d443d3cd` (2025-09-27, upstream ~PR #23037 era).
+- Upstream AzerothCore master is merged into the `Playerbot` branch repeatedly.
 - The repository's own `master` branch (`origin/master`) is an ancestor of `Playerbot`.
-- Local commits on top: `24c4e5664` ("initial commit" — touches
-  `apps/installer/includes/os_configs/ubuntu.sh` and adds `modules/TrackingModule.h`) and
-  `1507ab3f` (adds this documentation spec). See [divergences-and-status.md](divergences-and-status.md).
+- Local work on top adds the custom systems and this documentation set. There is no fixed list of
+  "local commits" here on purpose — the branch and working tree evolve; run `git log`/`git status`
+  for the live values. See [divergences-and-status.md](divergences-and-status.md) for what is
+  custom.
 
 `acore.json` identifies the project:
 
@@ -40,7 +40,7 @@ post-13.0.0 development line) — it is *not* a fork-specific version bump.
 ## What "Playerbot" means here
 
 The `Playerbot` branch exists to support **`mod-playerbots`** (liyunfan1223's fork of
-[IKE3's Playerbots](https://github.com/ike3/mangosbot)). The module's README
+[IKE3's Playerbots](https://github.com/ike3/mangosbot), now under the `mod-playerbots` org). The module's README
 (`modules/mod-playerbots/README.md`) describes it as "an AzerothCore module that adds player-like
 bots to a server", and explicitly states it **requires a custom branch of AzerothCore to compile
 and run** — namely this one (`liyunfan1223/azerothcore-wotlk/tree/Playerbot`). Its features, quoted

@@ -34,8 +34,12 @@ data/sql/
     └── README.md
 ```
 
-The `pending_db_*` directories currently contain **only `create_sql.sh`** — no pending update
-files (a normal state; the import workflow exists in `.github/workflows/import_pending.yml`).
+The `pending_db_*` directories are the in-flight drop box for new updates; the world dir currently
+carries the 81–85 / pet-scaling revisions (list the directory for the live set). The CI import
+workflow is `.github/workflows/import_pending.yml`.
+
+**Never hand-edit anything under `data/sql/` except `data/sql/updates/pending_db_*/`** — `base/`,
+`archive/`, and `updates/db_*/` are immutable (see `.agents/docs/sql-guidelines.md`).
 
 ## How content is imported and applied
 
@@ -75,6 +79,13 @@ Each module ships its own SQL and registers it with the db assembler:
   `playerbots_travelnode(_link/_path)`, `playerbots_weightscale(_data)`, plus
   `version_db_playerbots` (DB revision tracking, reported by the core's
   `GetPlayerbotsDBRevision()`).
+- **Custom modules** add their own tables (applied at startup via `Updates.AutoSetup`):
+  `mod-fury` → `account_fury` (acore_auth); `mod-random-enchants` → `mod_re_rates`,
+  `mod_re_item_variants`, `mod_re_spec_archetype`, `mod_re_suffix_boost`,
+  `mod_re_class_archetype`, `mod_re_pool_rates`, and the `spellitemenchantment_dbc` matrix mirror
+  (acore_world); `mod-qol` → `account_taxi` (acore_auth) + `mod_qol_pins` / `mod_qol_points`
+  (acore_world); `mod-talent` → the account talent / Primeris tables; `mod-collections` and
+  `mod-transmog` → appearance/collection tables.
 
 The runtime `env/dist/etc/modules/playerbots.conf`'s `AiPlayerbot.*` settings control whether bots
 are created/populated (see [configuration.md](configuration.md)).
