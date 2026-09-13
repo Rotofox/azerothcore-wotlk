@@ -53,6 +53,7 @@ fi
 if [[ $DOCKER != 1 && $SKIP_MYSQL_INSTALL != 1 ]]; then
   # LOCAL DIVERGENCE (Rotofox/Playerbot): MySQL is provisioned separately on this host, so the
   # installer must not try to install it. Upstream's block is kept below, commented out.
+  : # no-op — nothing to install; a bash `then` block cannot be empty (comments don't count)
 #  if [[ "$UBUNTU_VERSION" == "24.04" ]]; then
 #    # run noninteractive install for MYSQL 8.4 LTS
 #    wget https://dev.mysql.com/get/mysql-apt-config_0.8.35-1_all.deb -P "$VAR_PATH"
